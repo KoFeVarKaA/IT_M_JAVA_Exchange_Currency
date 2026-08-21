@@ -1,0 +1,19 @@
+package exchangecurrency.dao;
+
+import exchangecurrency.entity.Currency;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+
+public interface DaoCurrencies {
+    void createTable();
+    void deleteTable();
+    int post(Currency dto);
+    Optional<Currency> getById(String id);
+    Optional<Currency> getByCode(String code);
+    OptionalInt get_id_by_code(String code);
+    Optional<List<Currency>> getAll();
+    void update(Currency dto);
+    void delete(int id);
+}
