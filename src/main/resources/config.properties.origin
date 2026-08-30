@@ -1,0 +1,11 @@
+# Настройки подключения к базе данных SQLite или MySQL
+hikari.jdbcUrl=jdbc:sqlite:my_database.db
+hikari.username=sa
+hikari.password=ВАШ_ПАРОЛЬ_ЗДЕСЬ
+
+# Настройки пула HikariCP
+hikari.maximumPoolSize=10
+hikari.connectionTimeout=10000
+
+# Настройки логирования (если есть)
+app.log.level=INFO

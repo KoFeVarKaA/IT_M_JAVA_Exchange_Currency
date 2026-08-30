@@ -47,12 +47,12 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
 
     @Override
     public void deleteTable() {
-        try (Connection conn = database.getConnection();
+        /*try (Connection conn = database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE)) {
 
         } catch (SQLException exception) {
 
-        }
+        } */
     }
 
     @Override
