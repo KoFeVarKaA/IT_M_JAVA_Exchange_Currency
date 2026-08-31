@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class DatabaseManager {
@@ -19,15 +20,16 @@ public class DatabaseManager {
     private static final String POOL_NAME = "exchange-currency-pool";
     private static final String CONFIG_FILE_NAME = "config.properties";
 
-    private DatabaseManager() {
+    static {
         init();
     }
 
-    private void init() {
+    private static void init() {
         Properties properties = new Properties();
 
-        try (FileInputStream fileInputStream = new FileInputStream(CONFIG_FILE_NAME)) {
-            properties.load(fileInputStream);
+        try (InputStream inputStream = DatabaseManager.class
+                .getClassLoader().getResourceAsStream(CONFIG_FILE_NAME)) {
+            properties.load(inputStream);
 
             HikariConfig hikariConfig = new HikariConfig();
             hikariConfig.setJdbcUrl(properties.getProperty("hikari.jdbcUrl"));
@@ -44,9 +46,11 @@ public class DatabaseManager {
             LOGGER.debug("Пул соединений с бд {} запущен", POOL_NAME);
 
         } catch (FileNotFoundException e) {
-            System.out.print("Файл config.properties не найден");
+            LOGGER.error("Файл config.properties не найден");
+            System.exit(1);
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            LOGGER.error(ex.getMessage());
+            System.exit(1);
         }
     }
 

@@ -1,5 +1,7 @@
 package exchangecurrency.dao.jdbc;
 
+import exchangecurrency.config.DatabaseManager;
+import exchangecurrency.dao.jdbc.mappers.CurrencyRowMapper;
 import exchangecurrency.entity.Currency;
 import exchangecurrency.dao.DaoCurrencies;
 import exchangecurrency.exeptons.DatabaseException;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -25,16 +28,15 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
                   sign VARCHAR(5)
                 );
             """;
+    private static final String GET_BY_ID = """
+            SELECT * FROM currencies WHERE id = ?
+            """;
 
-
-    private final DataSource database;
-    public JdbcDaoCurrencies(DataSource database){
-        this.database = database;
-    }
+    public JdbcDaoCurrencies(){}
 
     @Override
     public void createTable() {
-        try (Connection conn = database.getConnection();
+        try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE)) {
             stmt.executeUpdate();
             LOGGER.debug("Таблица Currency успешно создана");
@@ -62,6 +64,18 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
 
     @Override
     public Optional<Currency> getById(String id) {
+        try (Connection conn = DatabaseManager.getDataSource().getConnection();
+             PreparedStatement statement = conn.prepareStatement(GET_BY_ID);){
+            statement.setString(1, id);
+            try (ResultSet resultSet = statement.executeQuery();) {
+                if (resultSet.next()) {
+                    return Optional.of(CurrencyRowMapper.mapRow(resultSet)); }
+            }
+        } catch (SQLException exception) {
+            String message = "Ошибка получения пользователя id = " + id;
+            LOGGER.error(message);
+            throw new DatabaseException(message);
+        }
         return Optional.empty();
     }
 
