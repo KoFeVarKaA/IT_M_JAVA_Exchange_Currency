@@ -9,11 +9,11 @@ import java.util.OptionalInt;
 public interface DaoCurrencies {
     void createTable();
     void deleteTable();
-    int post(Currency dto);
+    void post(Currency dto);
     Optional<Currency> getById(String id);
     Optional<Currency> getByCode(String code);
     Optional<List<Currency>> getAll();
     OptionalInt get_id_by_code(String code);
     void update(Currency dto);
-    void delete(int id);
+    void delete(long id);
 }

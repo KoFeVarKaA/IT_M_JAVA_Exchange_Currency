@@ -10,7 +10,7 @@ public class Main{
 
     public static void main() {
         LOGGER.info("Запуск приложения...");
-        dao.createTable();
+//        dao.createTable();
         System.out.println(dao.getById("0"));
     }
 }
