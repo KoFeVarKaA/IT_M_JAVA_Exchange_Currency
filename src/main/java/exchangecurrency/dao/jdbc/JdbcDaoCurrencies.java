@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -69,7 +70,7 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE)) {
             stmt.executeUpdate();
-            LOGGER.debug("Таблица Currency успешно удалена");
+            LOGGER.debug("Таблица Currencies успешно удалена");
         } catch (SQLException exception) {
             String message = "Ошибка удаления таблицы currency:" + exception.getMessage();
             LOGGER.error(message);
@@ -82,12 +83,12 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement statement = conn.prepareStatement(POST);){
 
-            statement.setString(1, dto.getCode());
-            statement.setString(2, dto.getFullName());
-            statement.setString(3, dto.getSign());
+            statement.setString(1, dto.code());
+            statement.setString(2, dto.fullName());
+            statement.setString(3, dto.sign());
             statement.executeQuery();
         } catch (SQLException exception) {
-            String message = "Ошибка созранения валюты " + dto.getFullName();
+            String message = "Ошибка созранения валюты " + dto.fullName();
             LOGGER.error(message);
             throw new DatabaseException(message);
         }
@@ -103,7 +104,7 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
                     return Optional.of(CurrencyRowMapper.mapRow(resultSet)); }
             }
         } catch (SQLException exception) {
-            String message = "Ошибка получения пользователя id = " + id;
+            String message = "Ошибка получения валюты id = " + id;
             LOGGER.error(message);
             throw new DatabaseException(message);
         }
@@ -120,7 +121,7 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
                     return Optional.of(CurrencyRowMapper.mapRow(resultSet)); }
             }
         } catch (SQLException exception) {
-            String message = "Ошибка получения пользователя code = " + code;
+            String message = "Ошибка получения валюты code = " + code;
             LOGGER.error(message);
             throw new DatabaseException(message);
         }
@@ -137,7 +138,7 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
                     return OptionalInt.of(resultSet.getInt("id")); }
             }
         } catch (SQLException exception) {
-            String message = "Ошибка получения id пользователя code = " + code;
+            String message = "Ошибка получения id валюты code = " + code;
             LOGGER.error(message);
             throw new DatabaseException(message);
         }
@@ -146,8 +147,20 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
 
     @Override
     public Optional<List<Currency>> getAll() {
-//        Нужен пагинатор
-        return Optional.empty();
+        try (Connection conn = DatabaseManager.getDataSource().getConnection();
+             PreparedStatement statement = conn.prepareStatement(GET_ALL);
+             ResultSet resultSet = statement.executeQuery();){
+
+            List<Currency> currencies = new ArrayList<>();
+            while (resultSet.next()) {
+                currencies.add(CurrencyRowMapper.mapRow(resultSet));
+            }
+            return Optional.of(currencies);
+        } catch (SQLException exception) {
+            String message = "Ошибка получения списка валют";
+            LOGGER.error(message);
+            throw new DatabaseException(message);
+        }
     }
 
     @Override
@@ -155,13 +168,13 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement statement = conn.prepareStatement(UPDATE);){
 
-            statement.setString(1, dto.getCode());
-            statement.setString(2, dto.getFullName());
-            statement.setString(3, dto.getSign());
-            statement.setLong(4, dto.getId());
+            statement.setString(1, dto.code());
+            statement.setString(2, dto.fullName());
+            statement.setString(3, dto.sign());
+            statement.setLong(4, dto.id());
             statement.executeQuery();
         } catch (SQLException exception) {
-            String message = "Ошибка обновления валюты " + dto.getFullName();
+            String message = "Ошибка обновления валюты " + dto.fullName();
             LOGGER.error(message);
             throw new DatabaseException(message);
         }

@@ -9,7 +9,7 @@ import java.util.OptionalInt;
 public interface DaoRates {
     void createTable();
     void deleteTable();
-    int post(Rate dto);
+    void post(Rate dto);
     Optional<Rate> getById(String id);
     Optional<Rate> getByIds(String baseCurrencyId, String targetCurrencyId);
     Optional<List<Rate>> getAll();
