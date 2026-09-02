@@ -1,6 +1,6 @@
 package exchangecurrency;
 
-import exchangecurrency.controller.HelloWorldServler;
+import exchangecurrency.controller.HelloWorldServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
@@ -23,9 +23,8 @@ public class Main{
         String docBase = new File(".").getAbsolutePath();
         Context ctx = tomcat.addContext("", docBase);
 
-        HelloWorldServler helloServlet = new HelloWorldServler();
+        HelloWorldServlet helloServlet = new HelloWorldServlet();
         Tomcat.addServlet(ctx, "helloWorldServlet", helloServlet);
-
         ctx.addServletMapping("/", "helloWorldServlet");
 
         LOGGER.info("Tomcat 11 запускается на порту 8080...");
