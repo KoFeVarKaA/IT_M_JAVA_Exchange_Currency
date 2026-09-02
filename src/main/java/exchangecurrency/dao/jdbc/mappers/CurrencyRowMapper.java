@@ -18,7 +18,7 @@ public class CurrencyRowMapper {
             resultSet.getLong("id"),
             resultSet.getString("code"),
             resultSet.getString("fullName"),
-            resultSet.getString("sign").charAt(0)
+            resultSet.getString("sign")
         );
         } catch (SQLException e) {
             String message = "Ошибка обработки данных из бд" + e.getMessage();
