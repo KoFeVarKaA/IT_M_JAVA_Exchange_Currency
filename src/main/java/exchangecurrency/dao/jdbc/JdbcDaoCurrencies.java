@@ -129,7 +129,7 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
     }
 
     @Override
-    public OptionalInt get_id_by_code(String code) {
+    public OptionalInt getIdByCode(String code) {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement statement = conn.prepareStatement(GET_ID_BY_CODE);){
             statement.setString(1, code);
