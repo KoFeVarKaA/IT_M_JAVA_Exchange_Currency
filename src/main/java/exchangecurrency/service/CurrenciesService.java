@@ -4,12 +4,15 @@ import exchangecurrency.dao.jdbc.JdbcDaoCurrencies;
 import exchangecurrency.dto.request.RequestPostCurrencyDto;
 import exchangecurrency.dto.response.ResponseCurrencyDto;
 import exchangecurrency.entity.Currency;
+import exchangecurrency.exeptons.DatabaseException;
 import exchangecurrency.exeptons.ObjectAlreadyExistsExceprion;
 import exchangecurrency.mappers.CurrencyMapper;
+import exchangecurrency.mappers.ResponseCurrencyDtoMapper;
 import exchangecurrency.utils.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 
 public class CurrenciesService {
@@ -18,7 +21,7 @@ public class CurrenciesService {
 
     public CurrenciesService (JdbcDaoCurrencies dao) {this.dao = dao;}
 
-    public ResponseCurrencyDto postCurrencies (RequestPostCurrencyDto dto) {
+    public ResponseCurrencyDto postCurrency (RequestPostCurrencyDto dto) {
         Optional<Currency> currencyOptional = dao.getByCode(dto.code());
         if (currencyOptional.isPresent()) {
             String message = "Ошибка - валюта " + dto.fullName() + " уже существует";
@@ -27,5 +30,23 @@ public class CurrenciesService {
         }
         Currency currency = CurrencyMapper.INSTANCE.toEntity(dto);
         dao.post(currency);
+
+        Optional<Currency> savedCurrencyOptional = dao.getByCode(dto.code());
+        if (savedCurrencyOptional.isEmpty()) {
+            String message = "Ошибка создания или получения Id валюты" + dto.fullName();
+            LOGGER.error(message);
+            throw new DatabaseException(message);
+        }
+        return ResponseCurrencyDtoMapper.INSTANCE.toEntity(savedCurrencyOptional.get());
+    }
+
+    public Optional<ResponseCurrencyDto> getCurrency(String code) {
+        return dao.getByCode(code).map(ResponseCurrencyDtoMapper.INSTANCE::toEntity);
+    }
+
+    public List<ResponseCurrencyDto> getCurrencies() {
+        return dao.getAll()
+                .map(ResponseCurrencyDtoMapper.INSTANCE::toEntityList)
+                .orElse(List.of());
     }
 }
