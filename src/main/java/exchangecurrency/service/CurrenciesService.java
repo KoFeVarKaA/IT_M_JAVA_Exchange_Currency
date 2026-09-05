@@ -5,7 +5,7 @@ import exchangecurrency.dto.request.RequestPostCurrencyDto;
 import exchangecurrency.dto.response.ResponseCurrencyDto;
 import exchangecurrency.entity.Currency;
 import exchangecurrency.exeptons.DatabaseException;
-import exchangecurrency.exeptons.ObjectAlreadyExistsExceprion;
+import exchangecurrency.exeptons.ObjectAlreadyExistsException;
 import exchangecurrency.mappers.CurrencyMapper;
 import exchangecurrency.mappers.ResponseCurrencyDtoMapper;
 import exchangecurrency.utils.JsonUtil;
@@ -26,7 +26,7 @@ public class CurrenciesService {
         if (currencyOptional.isPresent()) {
             String message = "Ошибка - валюта " + dto.fullName() + " уже существует";
             LOGGER.warn(message);
-            throw new ObjectAlreadyExistsExceprion(message);
+            throw new ObjectAlreadyExistsException(message);
         }
         dao.post(CurrencyMapper.INSTANCE.toEntity(dto));
 

@@ -1,7 +1,11 @@
 package exchangecurrency.exeptons;
 
-public class ValidationException extends RuntimeException {
+import jakarta.servlet.http.HttpServletResponse;
+
+public class ValidationException extends BaseException {
+    private static final int errorCode = HttpServletResponse.SC_BAD_REQUEST;
+
     public ValidationException(String message) {
-        super(message);
+        super(errorCode, message);
     }
 }

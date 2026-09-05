@@ -1,10 +1,14 @@
 package exchangecurrency.exeptons;
 
-public class DatabaseException extends RuntimeException{
+import jakarta.servlet.http.HttpServletResponse;
+
+public class DatabaseException extends BaseException {
+    private static final int errorCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+
     public DatabaseException() {
-        super("Ошибка базы данных");
+        super(errorCode, "Ошибка базы данных");
     }
     public DatabaseException(String message) {
-        super(message);
+        super(errorCode, message);
     }
 }

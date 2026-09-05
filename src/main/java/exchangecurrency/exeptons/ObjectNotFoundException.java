@@ -1,10 +1,14 @@
 package exchangecurrency.exeptons;
 
-public class ObjectNotFoundException extends RuntimeException {
+import jakarta.servlet.http.HttpServletResponse;
+
+public class ObjectNotFoundException extends BaseException {
+    private static final int errorCode = HttpServletResponse.SC_NOT_FOUND;
+
     public ObjectNotFoundException() {
-        super("Объект не найден");
+        super(errorCode, "Объект не найден");
     }
     public ObjectNotFoundException(String message) {
-        super(message);
+        super(errorCode, message);
     }
 }

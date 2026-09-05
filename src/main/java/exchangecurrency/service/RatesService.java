@@ -8,10 +8,9 @@ import exchangecurrency.dto.response.ResponseRateDto;
 import exchangecurrency.entity.Currency;
 import exchangecurrency.entity.Rate;
 import exchangecurrency.exeptons.DatabaseException;
-import exchangecurrency.exeptons.ObjectAlreadyExistsExceprion;
+import exchangecurrency.exeptons.ObjectAlreadyExistsException;
 import exchangecurrency.exeptons.ObjectNotFoundException;
 import exchangecurrency.mappers.RateMapper;
-import exchangecurrency.mappers.ResponseCurrencyDtoMapper;
 import exchangecurrency.mappers.ResponseRateDtoMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +88,7 @@ public class RatesService {
         if (rateInstanse.isPresent()) {
             String message = "Обменный курс для валют с id = " +rateIds+ "уже существует";
             LOGGER.warn(message);
-            throw new ObjectAlreadyExistsExceprion(message);
+            throw new ObjectAlreadyExistsException(message);
         }
 
         daoRates.post(RateMapper.INSTANCE.toEntity(dto));
