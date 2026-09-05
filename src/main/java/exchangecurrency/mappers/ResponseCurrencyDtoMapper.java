@@ -11,6 +11,6 @@ import java.util.List;
 public interface ResponseCurrencyDtoMapper {
     ResponseCurrencyDtoMapper INSTANCE = Mappers.getMapper(ResponseCurrencyDtoMapper.class);
 
-    ResponseCurrencyDto toEntity(Currency currency);
-    List<ResponseCurrencyDto> toEntityList(List<Currency> currencies);
+    ResponseCurrencyDto toDto(Currency currency);
+    List<ResponseCurrencyDto> toDtosList(List<Currency> currencies);
 }
