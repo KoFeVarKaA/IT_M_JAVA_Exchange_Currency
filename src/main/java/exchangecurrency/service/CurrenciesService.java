@@ -28,8 +28,7 @@ public class CurrenciesService {
             LOGGER.warn(message);
             throw new ObjectAlreadyExistsExceprion(message);
         }
-        Currency currency = CurrencyMapper.INSTANCE.toEntity(dto);
-        dao.post(currency);
+        dao.post(CurrencyMapper.INSTANCE.toEntity(dto));
 
         Optional<Currency> savedCurrencyOptional = dao.getByCode(dto.code());
         if (savedCurrencyOptional.isEmpty()) {
@@ -37,16 +36,16 @@ public class CurrenciesService {
             LOGGER.error(message);
             throw new DatabaseException(message);
         }
-        return ResponseCurrencyDtoMapper.INSTANCE.toEntity(savedCurrencyOptional.get());
+        return ResponseCurrencyDtoMapper.INSTANCE.toDto(savedCurrencyOptional.get());
     }
 
     public Optional<ResponseCurrencyDto> getCurrency(String code) {
-        return dao.getByCode(code).map(ResponseCurrencyDtoMapper.INSTANCE::toEntity);
+        return dao.getByCode(code).map(ResponseCurrencyDtoMapper.INSTANCE::toDto);
     }
 
     public List<ResponseCurrencyDto> getCurrencies() {
         return dao.getAll()
-                .map(ResponseCurrencyDtoMapper.INSTANCE::toEntityList)
+                .map(ResponseCurrencyDtoMapper.INSTANCE::toDtosList)
                 .orElse(List.of());
     }
 }
