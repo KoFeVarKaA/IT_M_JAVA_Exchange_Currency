@@ -8,7 +8,7 @@ import exchangecurrency.exeptons.DatabaseException;
 import exchangecurrency.exeptons.ObjectAlreadyExistsException;
 import exchangecurrency.mappers.CurrencyMapper;
 import exchangecurrency.mappers.ResponseCurrencyDtoMapper;
-import exchangecurrency.utils.JsonUtil;
+import exchangecurrency.utils.ResponseMakerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class CurrenciesService {
     private final JdbcDaoCurrencies dao;
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseMakerUtil.class);
 
     public CurrenciesService (JdbcDaoCurrencies dao) {this.dao = dao;}
 

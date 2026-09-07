@@ -4,8 +4,8 @@ public abstract  class BaseException extends RuntimeException {
     private final int errorCode;
 
     public BaseException(int errorCode, String message) {
-        this.errorCode = errorCode;
         super(message);
+        this.errorCode = errorCode;
     }
 
     public int getErrorCode() {
