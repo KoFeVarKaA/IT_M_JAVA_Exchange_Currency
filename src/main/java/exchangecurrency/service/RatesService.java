@@ -64,9 +64,10 @@ public class RatesService {
         }
         String idA = dto.baseCurrencyId();
         String idB = dto.targetCurrencyId();
-        String message = "Курс обмена для валютный пар с id " + idA+":"+idB +", "+ idB+":"+idA
-                +" или "+ UsdId+":"+idA +" и "+ UsdId+":"+idB + " не найден";
-        LOGGER.warn(message);
+        String message = """
+                Курс обмена для валютных пар с id %s:%s, %s:%s или %s:%s и %s:%s не найден\
+                """.formatted(idA, idB, idB, idA, UsdId, idA, UsdId, idB);
+        LOGGER.warn("{}", message);
         throw new ObjectNotFoundException(message);
     }
 

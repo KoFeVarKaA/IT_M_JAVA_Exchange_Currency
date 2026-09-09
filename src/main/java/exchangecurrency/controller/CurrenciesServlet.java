@@ -1,11 +1,10 @@
 package exchangecurrency.controller;
 
-import exchangecurrency.dao.jdbc.JdbcDaoCurrencies;
 import exchangecurrency.dto.request.RequestPostCurrencyDto;
 import exchangecurrency.dto.response.ResponseCurrencyDto;
 import exchangecurrency.exeptons.ValidationException;
 import exchangecurrency.service.CurrenciesService;
-import exchangecurrency.service.validator.CurrencyPostValidator;
+import exchangecurrency.service.validator.CurrencyValidator;
 import exchangecurrency.utils.ResponseMakerUtil;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 @WebServlet(urlPatterns = "/currencies",
@@ -37,8 +35,6 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ValidationException {
-
-        LOGGER.info("doPost - /currencies");
         request.setCharacterEncoding("UTF-8");
 
         RequestPostCurrencyDto requestDto = new RequestPostCurrencyDto(
@@ -46,7 +42,9 @@ public class CurrenciesServlet extends HttpServlet {
                 request.getParameter("name"),
                 request.getParameter("sign")
         );
-        CurrencyPostValidator.validate(requestDto);
+        String message = "doPost - /currencies data = " + requestDto.toString();
+        LOGGER.info(message);
+        CurrencyValidator.validate(requestDto);
         ResponseCurrencyDto responseDto = service.postCurrency(requestDto);
         ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, responseDto);
     }

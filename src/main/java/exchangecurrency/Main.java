@@ -37,8 +37,7 @@ public class Main{
             tomcat.start();
             tomcat.getServer().await();
         } catch (Exception e) {
-            String message = "Ошибка запуска сервера" + e.getMessage();
-            LOGGER.error(message);
+            LOGGER.error("Ошибка запуска сервера {}", e.getMessage());
         }
     }
 
