@@ -23,11 +23,11 @@ public final class ResponseMakerUtil {
             OBJECT_MAPPER.writeValue(response.getWriter(), dto);
         } catch (JsonProcessingException e) {
             String message = "Ошибка преобразования dto в json - " + dto;
-            LOGGER.error(message);
+            LOGGER.error("{}", message);
             throw new ValidationException(message + e.getMessage());
         } catch (IOException e) {
             String message = "Ошибка сети (IOExceprion)" + e.getMessage();
-            LOGGER.warn(message);
+            LOGGER.warn("{}", message);
             if (!response.isCommitted()) {
                 try {
                     response.reset();

@@ -70,9 +70,9 @@ public class JdbcDaoRates implements DaoRates {
             stmt.executeUpdate();
             LOGGER.debug("Таблица Rates успешно удалена");
         } catch (SQLException exception) {
-            String message = "Ошибка удаления таблицы Rates:" + exception.getMessage();
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка удаления таблицы Rates: {}", exception.getMessage());
+            throw new DatabaseException(
+                    "Ошибка удаления таблицы Rates:" + exception.getMessage());
         }
     }
 
@@ -86,10 +86,12 @@ public class JdbcDaoRates implements DaoRates {
             statement.setBigDecimal(3, dto.rate());
             statement.executeQuery();
         } catch (SQLException exception) {
-            String message = "Ошибка созранения курса обсмена валюты с baseCurrencyId = "
-               + dto.baseCurrencyId() + " в targetCurrencyId = " + dto.targetCurrencyId();
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("""
+                    Ошибка созранения курса обсмена валюты с baseCurrencyId = {} \
+                    в targetCurrencyId = {}""", dto.baseCurrencyId(), dto.targetCurrencyId());
+            throw new DatabaseException(
+                    "Ошибка созранения курса обсмена валюты с baseCurrencyId = "
+                    + dto.baseCurrencyId() + " в targetCurrencyId = " + dto.targetCurrencyId());
         }
     }
 
@@ -104,9 +106,8 @@ public class JdbcDaoRates implements DaoRates {
             }
             return Optional.empty();
         } catch (SQLException exception) {
-            String message = "Ошибка получения курса id = " + id;
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка получения курса id = {}", id);
+            throw new DatabaseException("Ошибка получения курса id = " + id);
         }
     }
 
@@ -125,7 +126,9 @@ public class JdbcDaoRates implements DaoRates {
         } catch (SQLException exception) {
             String message = "Ошибка получения курса обсмена валюты с baseCurrencyId = "
                + baseCurrencyId + " в targetCurrencyId = " + targetCurrencyId;
-            LOGGER.error(message);
+            LOGGER.error("""
+                    Ошибка получения курса обсмена валюты с baseCurrencyId = {} \
+                    в targetCurrencyId = {}""", baseCurrencyId, targetCurrencyId);
             throw new DatabaseException(message);
         }
     }
@@ -142,9 +145,8 @@ public class JdbcDaoRates implements DaoRates {
             }
             return Optional.of(rates);
         } catch (SQLException exception) {
-            String message = "Ошибка получения списка курса валют";
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка получения списка курса валют");
+            throw new DatabaseException("Ошибка получения списка курса валют");
         }
     }
 
@@ -157,9 +159,8 @@ public class JdbcDaoRates implements DaoRates {
             statement.setLong(2, dto.id());
             statement.executeQuery();
         } catch (SQLException exception) {
-            String message = "Ошибка обновления курса id = " + dto.id();
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка обновления курса id = {}", dto.id());
+            throw new DatabaseException("Ошибка обновления курса id = " + dto.id());
         }
     }
 
@@ -171,9 +172,8 @@ public class JdbcDaoRates implements DaoRates {
             statement.setLong(1, id);
             statement.executeQuery();
         } catch (SQLException exception) {
-            String message = "Ошибка удаления курса " + id;
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка удаления курса {}", id);
+            throw new DatabaseException("Ошибка удаления курса " + id);
         }
     }
 }

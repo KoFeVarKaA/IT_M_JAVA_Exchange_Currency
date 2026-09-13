@@ -21,9 +21,8 @@ public class CurrencyRowMapper {
             resultSet.getString("sign")
         );
         } catch (SQLException e) {
-            String message = "Ошибка обработки данных из бд" + e.getMessage();
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка обработки данных из бд {}", e.getMessage());
+            throw new DatabaseException("Ошибка обработки данных из бд " + e.getMessage());
         }
     }
 }

@@ -24,17 +24,15 @@ public class CurrenciesService {
     public ResponseCurrencyDto postCurrency (RequestPostCurrencyDto dto) {
         Optional<Currency> currencyOptional = dao.getByCode(dto.code());
         if (currencyOptional.isPresent()) {
-            String message = "Ошибка - валюта " + dto.fullName() + " уже существует";
-            LOGGER.warn(message);
-            throw new ObjectAlreadyExistsException(message);
+            LOGGER.warn("Ошибка - валюта {} уже существует", dto.fullName());
+            throw new ObjectAlreadyExistsException("Ошибка - валюта " + dto.fullName() + " уже существует");
         }
         dao.post(CurrencyMapper.INSTANCE.toEntity(dto));
 
         Optional<Currency> savedCurrencyOptional = dao.getByCode(dto.code());
         if (savedCurrencyOptional.isEmpty()) {
-            String message = "Ошибка создания или получения Id валюты" + dto.fullName();
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка создания или получения Id валюты {}", dto.fullName());
+            throw new DatabaseException("Ошибка создания или получения Id валюты" + dto.fullName());
         }
         return ResponseCurrencyDtoMapper.INSTANCE.toDto(savedCurrencyOptional.get());
     }

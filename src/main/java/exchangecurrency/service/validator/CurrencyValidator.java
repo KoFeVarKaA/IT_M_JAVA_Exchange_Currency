@@ -27,8 +27,7 @@ public class CurrencyValidator {
     }
 
     private static void throwInputError(String message) {
-        String loggerMessage = "doPost - /currencies: ";
-        LOGGER.warn(loggerMessage);
+        LOGGER.warn("doPost - /currencies: {}", message);
         throw new ValidationException(message);
     }
 

@@ -49,7 +49,7 @@ public class DatabaseManager {
             LOGGER.error("Файл config.properties не найден");
             System.exit(1);
         } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
+            LOGGER.error("{}", ex.getMessage());
             System.exit(1);
         }
     }

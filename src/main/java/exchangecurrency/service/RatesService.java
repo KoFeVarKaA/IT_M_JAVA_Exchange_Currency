@@ -80,7 +80,7 @@ public class RatesService {
                 dto.targetCurrencyId()));
         if (baseCurrency.isEmpty() || targetCurrency.isEmpty()) {
             String message = "Валюты с id = " +rateIds+ "не найдены";
-            LOGGER.warn(message);
+            LOGGER.warn("{}", message);
             throw new ObjectNotFoundException(message);
         }
 
@@ -88,7 +88,7 @@ public class RatesService {
                 String.valueOf(dto.targetCurrencyId()));
         if (rateInstanse.isPresent()) {
             String message = "Обменный курс для валют с id = " +rateIds+ "уже существует";
-            LOGGER.warn(message);
+            LOGGER.warn("{}", message);
             throw new ObjectAlreadyExistsException(message);
         }
 
@@ -98,7 +98,7 @@ public class RatesService {
         if (savedRateOptional.isEmpty()) {
             String message = "Ошибка создания или получения обменного курса для валют с id = "
                     +rateIds;
-            LOGGER.error(message);
+            LOGGER.error("{}", message);
             throw new DatabaseException(message);
         }
         return ResponseRateDtoMapper.INSTANCE.toDto(savedRateOptional.get());

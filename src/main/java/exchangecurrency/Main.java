@@ -1,5 +1,3 @@
-package exchangecurrency;
-
 import exchangecurrency.controller.HelloWorldServlet;
 import exchangecurrency.utils.ExceptionFilter;
 import jakarta.servlet.Filter;
@@ -14,7 +12,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 
-public class Main{
+public static class Main{
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     static void main() {
@@ -61,3 +59,7 @@ public class Main{
         ctx.addFilterMap(map);
 
     }
+
+void main() {
+    Main.main();
+}

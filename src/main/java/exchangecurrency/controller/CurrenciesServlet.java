@@ -42,8 +42,7 @@ public class CurrenciesServlet extends HttpServlet {
                 request.getParameter("name"),
                 request.getParameter("sign")
         );
-        String message = "doPost - /currencies data = " + requestDto.toString();
-        LOGGER.info(message);
+        LOGGER.info("doPost - /currencies data = {}", requestDto.toString());
         CurrencyValidator.validate(requestDto);
         ResponseCurrencyDto responseDto = service.postCurrency(requestDto);
         ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, responseDto);

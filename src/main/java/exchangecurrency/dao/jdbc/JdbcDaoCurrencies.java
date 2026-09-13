@@ -72,9 +72,9 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
             stmt.executeUpdate();
             LOGGER.debug("Таблица Currencies успешно удалена");
         } catch (SQLException exception) {
-            String message = "Ошибка удаления таблицы currency:" + exception.getMessage();
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка удаления таблицы currency: {}", exception.getMessage());
+            throw new DatabaseException(
+                    "Ошибка удаления таблицы currency:" + exception.getMessage());
         }
     }
 
@@ -88,9 +88,8 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
             statement.setString(3, dto.sign());
             statement.executeQuery();
         } catch (SQLException exception) {
-            String message = "Ошибка созранения валюты " + dto.fullName();
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка созранения валюты {}", dto.fullName());
+            throw new DatabaseException("Ошибка созранения валюты " + dto.fullName());
         }
     }
 
@@ -104,9 +103,8 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
                     return Optional.of(CurrencyRowMapper.mapRow(resultSet)); }
             }
         } catch (SQLException exception) {
-            String message = "Ошибка получения валюты id = " + id;
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка получения валюты id = {}", id);
+            throw new DatabaseException("Ошибка получения валюты id = " + id);
         }
         return Optional.empty();
     }
@@ -121,9 +119,8 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
                     return Optional.of(CurrencyRowMapper.mapRow(resultSet)); }
             }
         } catch (SQLException exception) {
-            String message = "Ошибка получения валюты code = " + code;
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка получения валюты code = {}", code);
+            throw new DatabaseException("Ошибка получения валюты code = " + code);
         }
         return Optional.empty();
     }
@@ -138,9 +135,8 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
                     return OptionalInt.of(resultSet.getInt("id")); }
             }
         } catch (SQLException exception) {
-            String message = "Ошибка получения id валюты code = " + code;
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка получения id валюты code = {}", code);
+            throw new DatabaseException("Ошибка получения id валюты code = " + code);
         }
         return OptionalInt.empty();
     }
@@ -157,9 +153,8 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
             }
             return Optional.of(currencies);
         } catch (SQLException exception) {
-            String message = "Ошибка получения списка валют";
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка получения списка валют");
+            throw new DatabaseException("Ошибка получения списка валют");
         }
     }
 
@@ -174,9 +169,8 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
             statement.setLong(4, dto.id());
             statement.executeQuery();
         } catch (SQLException exception) {
-            String message = "Ошибка обновления валюты " + dto.fullName();
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка обновления валюты {}", dto.fullName());
+            throw new DatabaseException("Ошибка обновления валюты " + dto.fullName());
         }
     }
 
@@ -188,9 +182,8 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
             statement.setLong(1, id);
             statement.executeQuery();
         } catch (SQLException exception) {
-            String message = "Ошибка удаления валюты " + id;
-            LOGGER.error(message);
-            throw new DatabaseException(message);
+            LOGGER.error("Ошибка удаления валюты {}", id);
+            throw new DatabaseException("Ошибка удаления валюты " + id);
         }
     }
 }
