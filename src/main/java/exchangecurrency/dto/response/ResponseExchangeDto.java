@@ -4,10 +4,12 @@ import exchangecurrency.entity.Currency;
 
 import java.math.BigDecimal;
 
-public record ResponseRateDto (
+public record ResponseExchangeDto (
         long id,
         Currency baseCurrency,
         Currency targetCurrency,
-        BigDecimal rate
-) {}
-
+        BigDecimal rate,
+        BigDecimal amount,
+        BigDecimal convertedAmount
+){
+}

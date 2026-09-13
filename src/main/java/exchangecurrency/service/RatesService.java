@@ -31,45 +31,60 @@ public class RatesService {
     }
 
     public ResponseRateDto getRate(RequestGetRateDto dto) {
-        // Существует валютная пара AB - берём её курс
-        Optional<Rate> rateAB = daoRates.getByIds(dto.baseCurrencyId(), dto.targetCurrencyId());
-        if (rateAB.isPresent()) {return ResponseRateDtoMapper.INSTANCE.toDto(rateAB.get());}
+        Optional<Currency> baseCurrencyOpt = daoCurrencies.getByCode(dto.baseCurrencyCode());
+        Optional<Currency> targetCurrencyOpt = daoCurrencies.getByCode(dto.targetCurrencyCode());
+        if (baseCurrencyOpt.isEmpty() || targetCurrencyOpt.isEmpty()) {
+            LOGGER.warn("Валюты с code = '{}' и/или '{}' не найдены",
+                    dto.baseCurrencyCode(), dto.targetCurrencyCode());
+            throw new ObjectNotFoundException("Валюты с code = '%s' и/или '%s' не найдены"
+                    .formatted(dto.baseCurrencyCode(), dto.targetCurrencyCode()));
+        }
 
-        // Существует валютная пара BA - берем её курс, и считаем обратный, чтобы получить AB
-        Optional<Rate> rateBA = daoRates.getByIds(dto.targetCurrencyId(), dto.baseCurrencyId());
+        String baseCurrencyId = String.valueOf(baseCurrencyOpt.get().id());
+        String targetCurrencyId = String.valueOf(targetCurrencyOpt.get().id());
+
+        // Существует валютная пара AB (base-target) - берём её курс
+        Optional<Rate> rateAB = daoRates.getByIds(baseCurrencyId, targetCurrencyId);
+        if (rateAB.isPresent()) {return ResponseRateDtoMapper.INSTANCE.toDto(
+                rateAB.get(), baseCurrencyOpt.get(), targetCurrencyOpt.get());}
+
+        // Существует валютная пара BA (target-base) - берем её курс,
+        // и считаем обратный, чтобы получить AB
+        Optional<Rate> rateBA = daoRates.getByIds(targetCurrencyId, baseCurrencyId);
         if (rateBA.isPresent()) {
             BigDecimal reverseRate = BigDecimal.ONE.divide(
                     rateBA.get().rate(), 6, RoundingMode.HALF_UP);
-            return ResponseRateDtoMapper.INSTANCE.toDto(rateBA.get(), reverseRate);
+            return ResponseRateDtoMapper.INSTANCE.toDto(
+                    rateBA.get(), baseCurrencyOpt.get(), targetCurrencyOpt.get(), reverseRate);
         }
 
         // Существует валютные пары USD-A и USD-B - вычисляем из этих курсов курс AB
         OptionalInt UsdId = daoCurrencies.getIdByCode("USD");
         if (UsdId.isPresent()) {
             Optional<Rate> rateUsdA = daoRates.getByIds(
-                    String.valueOf(UsdId), dto.baseCurrencyId());
+                    String.valueOf(UsdId), baseCurrencyId);
             Optional<Rate> rateUsdB = daoRates.getByIds(
-                    String.valueOf(UsdId), dto.targetCurrencyId());
+                    String.valueOf(UsdId), targetCurrencyId);
             if (rateUsdA.isPresent() && rateUsdB.isPresent()) {
                 BigDecimal rateA = rateUsdA.get().rate();
                 BigDecimal rateB = rateUsdB.get().rate();
                 BigDecimal resultRate = rateB.divide(rateA, 6, RoundingMode.HALF_UP);
                 return ResponseRateDtoMapper.INSTANCE.toDto(
                         rateUsdA.get(),
-                        rateUsdA.get().targetCurrencyId(),
-                        rateUsdB.get().targetCurrencyId(),
+                        baseCurrencyOpt.get(),
+                        targetCurrencyOpt.get(),
                         resultRate
                 );
             }
-        }
-        String idA = dto.baseCurrencyId();
-        String idB = dto.targetCurrencyId();
+        } else {LOGGER.error("ВАЛЮТА USD НЕ НАЙДЕНА. Создайте валюту code = 'USD'");}
         String message = """
                 Курс обмена для валютных пар с id %s:%s, %s:%s или %s:%s и %s:%s не найден\
-                """.formatted(idA, idB, idB, idA, UsdId, idA, UsdId, idB);
+                """.formatted(baseCurrencyId, targetCurrencyId, targetCurrencyId,
+                baseCurrencyId, UsdId, baseCurrencyId, UsdId, targetCurrencyId);
         LOGGER.warn("{}", message);
         throw new ObjectNotFoundException(message);
     }
+
 
     public ResponseRateDto postRate(RequestPostRateDto dto){
         String rateIds = dto.baseCurrencyId() +" и/или "+ dto.targetCurrencyId();
@@ -93,15 +108,29 @@ public class RatesService {
         }
 
         daoRates.post(RateMapper.INSTANCE.toEntity(dto));
-        Optional<Rate> savedRateOptional = daoRates.getByIds(
+        Optional<Rate> savedRateOpt = daoRates.getByIds(
                 String.valueOf(dto.baseCurrencyId()), String.valueOf(dto.targetCurrencyId()));
-        if (savedRateOptional.isEmpty()) {
+        if (savedRateOpt.isEmpty()) {
             String message = "Ошибка создания или получения обменного курса для валют с id = "
                     +rateIds;
             LOGGER.error("{}", message);
             throw new DatabaseException(message);
         }
-        return ResponseRateDtoMapper.INSTANCE.toDto(savedRateOptional.get());
+
+        Optional<Currency> baseCurrencyOpt = daoCurrencies.getById(
+                String.valueOf(savedRateOpt.get().baseCurrencyId()));
+        Optional<Currency> targetCurrencyOpt = daoCurrencies.getById(
+                String.valueOf(savedRateOpt.get().targetCurrencyId()));
+        if (baseCurrencyOpt.isEmpty() || targetCurrencyOpt.isEmpty()) {
+            String message = "Валюты с id = '%s' и/или '%s' не найдены"
+                    .formatted(savedRateOpt.get().baseCurrencyId(),
+                            savedRateOpt.get().targetCurrencyId());
+            LOGGER.warn("{}", message);
+            throw new ObjectNotFoundException();
+        }
+
+        return ResponseRateDtoMapper.INSTANCE.toDto(
+                savedRateOpt.get(), baseCurrencyOpt.get(), targetCurrencyOpt.get());
     }
 
     public void updateRate(RequestPostRateDto dto){
