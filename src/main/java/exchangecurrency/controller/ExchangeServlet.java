@@ -16,8 +16,9 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 
-@WebServlet(urlPatterns = "/exchange/*",
-        description = "Получение конкретной валюты по коду")
+@WebServlet(urlPatterns = "/exchange",
+        description = "Расчет перевода определенного количества средств " +
+                "из одной валюты в другую")
 public class ExchangeServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeServlet.class);
     private final RatesService service;
@@ -28,6 +29,7 @@ public class ExchangeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws UnsupportedEncodingException {
         request.setCharacterEncoding("UTF-8");
+        LOGGER.info("doGET - /exchange?{}", request.getQueryString());
 
         RequestGetRateDto requestDto = new RequestGetRateDto(
                 request.getParameter("from"),

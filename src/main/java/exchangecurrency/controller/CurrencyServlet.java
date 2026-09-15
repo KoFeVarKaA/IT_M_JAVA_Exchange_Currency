@@ -38,14 +38,14 @@ public class CurrencyServlet extends HttpServlet {
         String code =  pathInfo.replace("/", "").trim();
         CurrencyValidator.validateCode(code);
 
-        LOGGER.info("{}{}", messageRequest, pathInfo);
+        LOGGER.info("{}/{}", messageRequest, pathInfo);
         Optional<ResponseCurrencyDto> currencyDto = service.getCurrency(code);
         if (currencyDto.isPresent()){
             ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, currencyDto);
             return;
         }
         String messageNotFound = "Ошибка объект currency code='%s'не найден".formatted(code);
-        LOGGER.warn("{}: {}", messageRequest, messageNotFound);
+        LOGGER.warn("{}/{}: {}", messageRequest, pathInfo, messageNotFound);
         throw new ObjectNotFoundException(messageNotFound);
     }
 }

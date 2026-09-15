@@ -3,7 +3,7 @@ package exchangecurrency.service;
 import exchangecurrency.dao.jdbc.JdbcDaoCurrencies;
 import exchangecurrency.dao.jdbc.JdbcDaoRates;
 import exchangecurrency.dto.request.RequestGetRateDto;
-import exchangecurrency.dto.request.RequestPostRateDto;
+import exchangecurrency.dto.request.RequestPatchRateDto;
 import exchangecurrency.dto.response.ResponseRateDto;
 import exchangecurrency.entity.Currency;
 import exchangecurrency.entity.Rate;
@@ -86,7 +86,7 @@ public class RatesService {
     }
 
 
-    public ResponseRateDto postRate(RequestPostRateDto dto){
+    public ResponseRateDto postRate(RequestPatchRateDto dto){
         String rateIds = dto.baseCurrencyId() +" и/или "+ dto.targetCurrencyId();
 
         Optional<Currency> baseCurrency = daoCurrencies.getById(String.valueOf(
@@ -133,7 +133,7 @@ public class RatesService {
                 savedRateOpt.get(), baseCurrencyOpt.get(), targetCurrencyOpt.get());
     }
 
-    public void updateRate(RequestPostRateDto dto){
+    public void updateRate(RequestPatchRateDto dto){
         daoRates.update(RateMapper.INSTANCE.toEntity(dto));
     }
 }
