@@ -85,55 +85,40 @@ public class RatesService {
         throw new ObjectNotFoundException(message);
     }
 
+    public ResponseRateDto postUpdateRate(RequestPatchRateDto dto, boolean isNew){
+        String rateCodesMessage = "с code = '%s' и/или '%s'"
+                .formatted(dto.baseCurrencyCode(), dto.targetCurrencyCode());
 
-    public ResponseRateDto postRate(RequestPatchRateDto dto){
-        String rateIds = dto.baseCurrencyId() +" и/или "+ dto.targetCurrencyId();
-
-        Optional<Currency> baseCurrency = daoCurrencies.getById(String.valueOf(
-                dto.baseCurrencyId()));
-        Optional<Currency> targetCurrency = daoCurrencies.getById(String.valueOf(
-                dto.targetCurrencyId()));
-        if (baseCurrency.isEmpty() || targetCurrency.isEmpty()) {
-            String message = "Валюты с id = " +rateIds+ "не найдены";
-            LOGGER.warn("{}", message);
-            throw new ObjectNotFoundException(message);
-        }
-
-        Optional<Rate> rateInstanse = daoRates.getByIds(String.valueOf(dto.baseCurrencyId()),
-                String.valueOf(dto.targetCurrencyId()));
-        if (rateInstanse.isPresent()) {
-            String message = "Обменный курс для валют с id = " +rateIds+ "уже существует";
-            LOGGER.warn("{}", message);
-            throw new ObjectAlreadyExistsException(message);
-        }
-
-        daoRates.post(RateMapper.INSTANCE.toEntity(dto));
-        Optional<Rate> savedRateOpt = daoRates.getByIds(
-                String.valueOf(dto.baseCurrencyId()), String.valueOf(dto.targetCurrencyId()));
-        if (savedRateOpt.isEmpty()) {
-            String message = "Ошибка создания или получения обменного курса для валют с id = "
-                    +rateIds;
-            LOGGER.error("{}", message);
-            throw new DatabaseException(message);
-        }
-
-        Optional<Currency> baseCurrencyOpt = daoCurrencies.getById(
-                String.valueOf(savedRateOpt.get().baseCurrencyId()));
-        Optional<Currency> targetCurrencyOpt = daoCurrencies.getById(
-                String.valueOf(savedRateOpt.get().targetCurrencyId()));
+        Optional<Currency> baseCurrencyOpt = daoCurrencies.getByCode(dto.baseCurrencyCode());
+        Optional<Currency> targetCurrencyOpt = daoCurrencies.getByCode(dto.targetCurrencyCode());
         if (baseCurrencyOpt.isEmpty() || targetCurrencyOpt.isEmpty()) {
-            String message = "Валюты с id = '%s' и/или '%s' не найдены"
-                    .formatted(savedRateOpt.get().baseCurrencyId(),
-                            savedRateOpt.get().targetCurrencyId());
-            LOGGER.warn("{}", message);
-            throw new ObjectNotFoundException();
+            LOGGER.warn(" Валюты {} не найдены", rateCodesMessage);
+            throw new ObjectNotFoundException("Валюты " +rateCodesMessage+ " не найдены");
         }
 
+        String baseCurrencyId = String.valueOf(baseCurrencyOpt.get().id());
+        String targetCurrencyId = String.valueOf(targetCurrencyOpt.get().id());
+
+        if (isNew) {
+            Optional<Rate> rateInstance = daoRates.getByIds(baseCurrencyId, targetCurrencyId);
+            if (rateInstance.isPresent()) {
+                String message = "Обменный курс для валют " + rateCodesMessage + "уже существует";
+                LOGGER.warn("{}", message);
+                throw new ObjectAlreadyExistsException(message);
+            }
+
+            daoRates.post(RateMapper.INSTANCE.toEntity(dto));
+        } else {
+            daoRates.update(RateMapper.INSTANCE.toEntity(dto));
+        }
+        Optional<Rate> savedRateOpt = daoRates.getByIds(baseCurrencyId, targetCurrencyId);
+        if (savedRateOpt.isEmpty()) {
+        String message = "Ошибка создания или получения обменного курса для валют "
+                +rateCodesMessage;;
+        LOGGER.error("{}", message);
+        throw new DatabaseException(message);
+        }
         return ResponseRateDtoMapper.INSTANCE.toDto(
                 savedRateOpt.get(), baseCurrencyOpt.get(), targetCurrencyOpt.get());
-    }
-
-    public void updateRate(RequestPatchRateDto dto){
-        daoRates.update(RateMapper.INSTANCE.toEntity(dto));
     }
 }
