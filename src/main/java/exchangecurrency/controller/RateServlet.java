@@ -53,7 +53,7 @@ public class RateServlet extends HttpServlet {
                 BigDecimal.valueOf(Long.parseLong(
                         request.getParameter("rate")))
                 );
-        ResponseRateDto responseDto = service.getRate(requestDto);
+        ResponseRateDto responseDto = service.postUpdateRate(requestDto, false);
         ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, responseDto);
     }
 
