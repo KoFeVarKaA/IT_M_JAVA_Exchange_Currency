@@ -86,10 +86,11 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
             statement.setString(1, dto.code());
             statement.setString(2, dto.fullName());
             statement.setString(3, dto.sign());
-            statement.executeQuery();
+            statement.executeUpdate();
         } catch (SQLException exception) {
-            LOGGER.error("Ошибка созранения валюты {}", dto.fullName());
-            throw new DatabaseException("Ошибка созранения валюты " + dto.fullName());
+            LOGGER.error("Ошибка созранения валюты {}: {}", dto.fullName(),
+                    exception.getMessage());
+            throw new DatabaseException("Ошибка сохранения валюты " + dto.fullName());
         }
     }
 
@@ -167,7 +168,7 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
             statement.setString(2, dto.fullName());
             statement.setString(3, dto.sign());
             statement.setLong(4, dto.id());
-            statement.executeQuery();
+            statement.executeUpdate();
         } catch (SQLException exception) {
             LOGGER.error("Ошибка обновления валюты {}", dto.fullName());
             throw new DatabaseException("Ошибка обновления валюты " + dto.fullName());
@@ -180,7 +181,7 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
              PreparedStatement statement = conn.prepareStatement(DELETE);){
 
             statement.setLong(1, id);
-            statement.executeQuery();
+            statement.executeUpdate();
         } catch (SQLException exception) {
             LOGGER.error("Ошибка удаления валюты {}", id);
             throw new DatabaseException("Ошибка удаления валюты " + id);

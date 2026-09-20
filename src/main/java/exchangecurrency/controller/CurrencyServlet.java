@@ -41,6 +41,7 @@ public class CurrencyServlet extends HttpServlet {
         LOGGER.info("{}/{}", messageRequest, pathInfo);
         Optional<ResponseCurrencyDto> currencyDto = service.getCurrency(code);
         if (currencyDto.isPresent()){
+            LOGGER.debug("{} - ответ: {}",messageRequest, currencyDto);
             ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, currencyDto);
             return;
         }

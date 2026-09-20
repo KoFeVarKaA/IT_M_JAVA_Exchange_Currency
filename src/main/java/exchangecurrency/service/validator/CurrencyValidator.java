@@ -9,7 +9,7 @@ public class CurrencyValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrencyValidator.class);
 
     private static final String CURRENCY_CODE_REGEX  = "^[A-Z]+$";
-    private static final String CURRENCY_NAME_REGEX = "^[a-zA-Z]$";
+    private static final String CURRENCY_NAME_REGEX = "^[a-zA-Z ]+$";
 
     public static void validate(RequestPostCurrencyDto dto) {
         if (dto.sign().length() != 1) {
@@ -20,6 +20,8 @@ public class CurrencyValidator {
     }
 
     public static void validateCode(String code){
+        if (code == null) {
+            throwInputError("Ошибка ввода. Передано нулевое значение");        }
         if (code.length() != 3) {
             throwInputError("Ошибка ввода. Длина кода валюты должна составлять 3 символа");}
         if (code.isEmpty() || !code.matches(CURRENCY_CODE_REGEX)) {

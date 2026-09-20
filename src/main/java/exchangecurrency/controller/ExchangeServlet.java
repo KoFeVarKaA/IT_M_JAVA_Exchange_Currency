@@ -44,6 +44,7 @@ public class ExchangeServlet extends HttpServlet {
         ResponseExchangeDto responseDto = ResponseExchangeDtoMapper.INSTANCE.toDto(
             RateDto, amount, convertedAmount
         );
+        LOGGER.debug("doGET - /exchange?{} - ответ: {}", request.getQueryString(), responseDto);
         ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, responseDto);
     }
 }

@@ -84,7 +84,7 @@ public class JdbcDaoRates implements DaoRates {
             statement.setLong(1, dto.baseCurrencyId());
             statement.setLong(2, dto.targetCurrencyId());
             statement.setBigDecimal(3, dto.rate());
-            statement.executeQuery();
+            statement.executeUpdate();
         } catch (SQLException exception) {
             LOGGER.error("""
                     Ошибка созранения курса обсмена валюты с baseCurrencyId = {} \
@@ -128,7 +128,8 @@ public class JdbcDaoRates implements DaoRates {
                + baseCurrencyId + " в targetCurrencyId = " + targetCurrencyId;
             LOGGER.error("""
                     Ошибка получения курса обсмена валюты с baseCurrencyId = {} \
-                    в targetCurrencyId = {}""", baseCurrencyId, targetCurrencyId);
+                    в targetCurrencyId = {} \n: {}""", baseCurrencyId, targetCurrencyId,
+                    exception.getMessage());
             throw new DatabaseException(message);
         }
     }
@@ -157,7 +158,7 @@ public class JdbcDaoRates implements DaoRates {
 
             statement.setBigDecimal(1, dto.rate());
             statement.setLong(2, dto.id());
-            statement.executeQuery();
+            statement.executeUpdate();
         } catch (SQLException exception) {
             LOGGER.error("Ошибка обновления курса id = {}", dto.id());
             throw new DatabaseException("Ошибка обновления курса id = " + dto.id());
@@ -170,7 +171,7 @@ public class JdbcDaoRates implements DaoRates {
              PreparedStatement statement = conn.prepareStatement(DELETE);){
 
             statement.setLong(1, id);
-            statement.executeQuery();
+            statement.executeUpdate();
         } catch (SQLException exception) {
             LOGGER.error("Ошибка удаления курса {}", id);
             throw new DatabaseException("Ошибка удаления курса " + id);

@@ -37,6 +37,7 @@ public class RateServlet extends HttpServlet {
                 codesStr.substring(3, 6)
         );
         ResponseRateDto responseDto = service.getRate(requestDto);
+        LOGGER.debug("doGET - /exchangeRate - ответ: {}", responseDto);
         ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, responseDto);
     }
 
@@ -44,24 +45,24 @@ public class RateServlet extends HttpServlet {
     protected void doPatch(HttpServletRequest request, HttpServletResponse response)
             throws UnsupportedEncodingException {
         request.setCharacterEncoding("UTF-8");
-        String messageRequest = "doGET - /exchangeRate";
+        String messageRequest = "doPATCH - /exchangeRate";
         String pathInfo = request.getPathInfo();
         String codesStr = getValidCodesStr(messageRequest, pathInfo);
         RequestPatchRateDto requestDto = new RequestPatchRateDto(
                 codesStr.substring(0, 3),
                 codesStr.substring(3, 6),
-                BigDecimal.valueOf(Long.parseLong(
-                        request.getParameter("rate")))
+                new BigDecimal(request.getParameter("rate"))
                 );
         ResponseRateDto responseDto = service.postUpdateRate(requestDto, false);
+        LOGGER.debug("{} - ответ: {}", messageRequest, responseDto);
         ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, responseDto);
     }
 
     private String getValidCodesStr(String messageRequest, String pathInfo) {
-        LOGGER.info("{}/{}", messageRequest, pathInfo);
+        LOGGER.info("{}{}", messageRequest, pathInfo);
         if (pathInfo == null || pathInfo.equals("/")) {
             String message = "Коды валют не указаны в URL";
-            LOGGER.warn("{}/{}: {}", messageRequest, pathInfo, message);
+            LOGGER.warn("{}{}: {}", messageRequest, pathInfo, message);
             throw new ValidationException(message);
         }
         String codesStr = pathInfo.replace("/", "").trim().toUpperCase();

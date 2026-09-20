@@ -14,12 +14,14 @@ import java.math.BigDecimal;
 public interface ResponseRateDtoMapper {
     ResponseRateDtoMapper INSTANCE = Mappers.getMapper(ResponseRateDtoMapper.class);
 
+    @Mapping(source = "rate.id", target = "id")
     @Mapping(source = "baseCurrency", target = "baseCurrency")
     @Mapping(source = "targetCurrency", target = "targetCurrency")
     ResponseRateDto toDto(Rate rate,
                           Currency baseCurrency,
                           Currency targetCurrency);
 
+    @Mapping(source = "rate.id", target = "id")
     @Mapping(source = "customRate", target = "rate")
     @Mapping(source = "baseCurrency", target = "baseCurrency")
     @Mapping(source = "targetCurrency", target = "targetCurrency")

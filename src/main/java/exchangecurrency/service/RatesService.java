@@ -109,6 +109,12 @@ public class RatesService {
 
             daoRates.post(RateMapper.INSTANCE.toEntity(dto));
         } else {
+            Optional<Rate> rateInstance = daoRates.getByIds(baseCurrencyId, targetCurrencyId);
+            if (rateInstance.isEmpty()) {
+                String message = "Обменного курса для валют " + rateCodesMessage + "не существует";
+                LOGGER.warn("{}", message);
+                throw new ObjectNotFoundException(message);
+            }
             daoRates.update(RateMapper.INSTANCE.toEntity(dto));
         }
         Optional<Rate> savedRateOpt = daoRates.getByIds(baseCurrencyId, targetCurrencyId);

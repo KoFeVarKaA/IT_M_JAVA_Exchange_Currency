@@ -29,6 +29,7 @@ public class CurrenciesServlet extends HttpServlet {
             throws IOException {
         LOGGER.info("doGET - /currencies");
         List<ResponseCurrencyDto> currencyDtos = service.getCurrencies();
+        LOGGER.debug("doGET - /currencies - ответ: {}", currencyDtos.toString());
         ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, currencyDtos);
     }
 
@@ -42,9 +43,10 @@ public class CurrenciesServlet extends HttpServlet {
                 request.getParameter("name"),
                 request.getParameter("sign")
         );
-        LOGGER.info("doPost - /currencies data = {}", requestDto.toString());
+        LOGGER.info("doPost - /currencies data = {}", requestDto);
         CurrencyValidator.validate(requestDto);
         ResponseCurrencyDto responseDto = service.postCurrency(requestDto);
+        LOGGER.info("doPost - /currencies - ответ: {}", responseDto.toString());
         ResponseMakerUtil.sendJson(response, HttpServletResponse.SC_OK, responseDto);
     }
 }
