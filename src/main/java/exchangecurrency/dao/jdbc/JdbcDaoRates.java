@@ -6,6 +6,7 @@ import exchangecurrency.dao.jdbc.mappers.CurrencyRowMapper;
 import exchangecurrency.dao.jdbc.mappers.RateRowMapper;
 import exchangecurrency.entity.Currency;
 import exchangecurrency.entity.Rate;
+import exchangecurrency.entity.RateCurrency;
 import exchangecurrency.exeptons.DatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +22,13 @@ import java.util.Optional;
 public class JdbcDaoRates implements DaoRates {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcDaoRates.class);
 
+    private static final String IS_EMPTY = "SELECT 1 FROM rates LIMIT 1";
     private static final String CREATE_TABLE = """
-                CREATE TABLE rates(
+                CREATE TABLE IF NOT EXISTS rates(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 baseCurrencyId INTEGER,
                 targetCurrencyId INTEGER,
-                rate Decimal(6),
+                rate NUMERIC(12, 6)
                 );
                 """;
     private static final String DELETE_TABLE = "DROP TABLE rates;";
@@ -39,7 +41,23 @@ public class JdbcDaoRates implements DaoRates {
                 SELECT * FROM rates
                 WHERE baseCurrencyId = ? AND targetCurrencyId = ?
                 """;
-    private static final String GET_ALL = "SELECT * FROM rates";
+    // Т.к. нет ORM пишем пришлось писать все вручную
+    private static final String GET_ALL = """
+    SELECT
+        r.id AS rate_id,
+        r.rate,
+        bc.id AS base_currency_id,
+        bc.code AS base_currency_code,
+        bc.fullName AS base_currency_name,
+        bc.sign AS base_currency_sing,
+        tc.id AS target_currency_id,
+        tc.code AS target_currency_code,
+        tc.fullName AS target_currency_name,
+        tc.sign AS target_currency_sing
+    FROM rates r
+    JOIN currencies bc ON r.baseCurrencyId = bc.id
+    JOIN currencies tc ON r.targetCurrencyId = tc.id
+    """;
     private static final String UPDATE = """
                 UPDATE rates
                 SET rate = ?
@@ -51,11 +69,23 @@ public class JdbcDaoRates implements DaoRates {
                 """;
 
     @Override
+    public boolean isEmpty() {
+        try(Connection conn = DatabaseManager.getDataSource().getConnection();
+            PreparedStatement statement = conn.prepareStatement(IS_EMPTY);
+            ResultSet resultSet = statement.executeQuery();) {
+            return !resultSet.next();
+        } catch (SQLException exception) {
+            LOGGER.error("Ошибка проверки существования записей в таблице rates");
+            throw new DatabaseException("Ошибка получения списка валют");
+        }
+    }
+
+    @Override
     public void createTable() {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE)) {
             stmt.executeUpdate();
-            LOGGER.debug("Таблица Rates успешно создана");
+            LOGGER.debug("Таблица Rates успешно инициализирована");
         } catch (SQLException exception) {
             String message = "Ошибка создания таблицы Rates";
             LOGGER.error(message);
@@ -114,10 +144,10 @@ public class JdbcDaoRates implements DaoRates {
     @Override
     public Optional<Rate> getByIds(String baseCurrencyId, String targetCurrencyId) {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
-             PreparedStatement statement = conn.prepareStatement(GET_BY_ID);){
+             PreparedStatement statement = conn.prepareStatement(GET_BY_IDS);){
 
-            statement.setString(1, baseCurrencyId);
-            statement.setString(2, targetCurrencyId);
+            statement.setLong(1, Long.parseLong(baseCurrencyId));
+            statement.setLong(2, Long.parseLong(targetCurrencyId));
             try (ResultSet resultSet = statement.executeQuery();) {
                 if (resultSet.next()) {
                     return Optional.of(RateRowMapper.mapRow(resultSet)); }
@@ -135,18 +165,37 @@ public class JdbcDaoRates implements DaoRates {
     }
 
     @Override
-    public Optional<List<Rate>> getAll() {
+    public Optional<List<RateCurrency>> getAll() {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement statement = conn.prepareStatement(GET_ALL);
              ResultSet resultSet = statement.executeQuery();){
 
-            List<Rate> rates = new ArrayList<>();
+            List<RateCurrency> rates = new ArrayList<>();
             while (resultSet.next()) {
-                rates.add(RateRowMapper.mapRow(resultSet));
+                Currency baseCurrency = new Currency(
+                        resultSet.getLong("base_currency_id"),
+                        resultSet.getString("base_currency_code"),
+                        resultSet.getString("base_currency_name"),
+                        resultSet.getString("base_currency_sing")
+                );
+
+                Currency targetCurrency = new Currency(
+                        resultSet.getLong("target_currency_id"),
+                        resultSet.getString("target_currency_code"),
+                        resultSet.getString("target_currency_name"),
+                        resultSet.getString("target_currency_sing")
+                );
+
+                rates.add(new RateCurrency(
+                        resultSet.getLong("rate_id"),
+                        baseCurrency,
+                        targetCurrency,
+                        resultSet.getBigDecimal("rate")
+                ));
             }
             return Optional.of(rates);
         } catch (SQLException exception) {
-            LOGGER.error("Ошибка получения списка курса валют");
+            LOGGER.error("Ошибка получения списка курса валют {}", exception.getMessage());
             throw new DatabaseException("Ошибка получения списка курса валют");
         }
     }
@@ -158,7 +207,7 @@ public class JdbcDaoRates implements DaoRates {
 
             statement.setBigDecimal(1, dto.rate());
             statement.setLong(2, dto.id());
-            statement.executeUpdate();
+            int res = statement.executeUpdate();
         } catch (SQLException exception) {
             LOGGER.error("Ошибка обновления курса id = {}", dto.id());
             throw new DatabaseException("Ошибка обновления курса id = " + dto.id());

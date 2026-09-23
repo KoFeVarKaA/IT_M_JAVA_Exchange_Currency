@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 public interface DaoCurrencies {
+    boolean isEmpty();
     void createTable();
     void deleteTable();
     void post(Currency dto);

@@ -5,6 +5,7 @@ import exchangecurrency.dto.request.RequestPatchRateDto;
 import exchangecurrency.dto.response.ResponseRateDto;
 import exchangecurrency.exeptons.ValidationException;
 import exchangecurrency.service.RatesService;
+import exchangecurrency.service.validator.RateValidator;
 import exchangecurrency.utils.ResponseMakerUtil;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.annotation.WebServlet;
@@ -48,6 +49,7 @@ public class RateServlet extends HttpServlet {
         String messageRequest = "doPATCH - /exchangeRate";
         String pathInfo = request.getPathInfo();
         String codesStr = getValidCodesStr(messageRequest, pathInfo);
+        RateValidator.validateRate(request.getParameter("rate"));
         RequestPatchRateDto requestDto = new RequestPatchRateDto(
                 codesStr.substring(0, 3),
                 codesStr.substring(3, 6),

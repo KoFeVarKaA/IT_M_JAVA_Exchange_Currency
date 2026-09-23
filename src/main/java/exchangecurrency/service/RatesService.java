@@ -7,6 +7,7 @@ import exchangecurrency.dto.request.RequestPatchRateDto;
 import exchangecurrency.dto.response.ResponseRateDto;
 import exchangecurrency.entity.Currency;
 import exchangecurrency.entity.Rate;
+import exchangecurrency.entity.RateCurrency;
 import exchangecurrency.exeptons.DatabaseException;
 import exchangecurrency.exeptons.ObjectAlreadyExistsException;
 import exchangecurrency.exeptons.ObjectNotFoundException;
@@ -17,8 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.util.*;
 
 public class RatesService {
     private final JdbcDaoCurrencies daoCurrencies;
@@ -62,9 +62,9 @@ public class RatesService {
         OptionalInt UsdId = daoCurrencies.getIdByCode("USD");
         if (UsdId.isPresent()) {
             Optional<Rate> rateUsdA = daoRates.getByIds(
-                    String.valueOf(UsdId), baseCurrencyId);
+                    String.valueOf(UsdId.getAsInt()), baseCurrencyId);
             Optional<Rate> rateUsdB = daoRates.getByIds(
-                    String.valueOf(UsdId), targetCurrencyId);
+                    String.valueOf(UsdId.getAsInt()), targetCurrencyId);
             if (rateUsdA.isPresent() && rateUsdB.isPresent()) {
                 BigDecimal rateA = rateUsdA.get().rate();
                 BigDecimal rateB = rateUsdB.get().rate();
@@ -83,6 +83,13 @@ public class RatesService {
                 baseCurrencyId, UsdId, baseCurrencyId, UsdId, targetCurrencyId);
         LOGGER.warn("{}", message);
         throw new ObjectNotFoundException(message);
+    }
+
+    public List<ResponseRateDto> getAllRates() {
+        Optional<List<RateCurrency>> ratesOpt = daoRates.getAll();
+        return ratesOpt.map(rates -> rates.stream()
+                        .map(ResponseRateDtoMapper.INSTANCE::toDto).toList())
+                .orElse(Collections.emptyList());
     }
 
     public ResponseRateDto postUpdateRate(RequestPatchRateDto dto, boolean isNew){
@@ -107,7 +114,11 @@ public class RatesService {
                 throw new ObjectAlreadyExistsException(message);
             }
 
-            daoRates.post(RateMapper.INSTANCE.toEntity(dto));
+            daoRates.post(RateMapper.INSTANCE.toEntity(0,
+                    Long.parseLong(baseCurrencyId),
+                    Long.parseLong(targetCurrencyId),
+                    dto.rate()
+            ));
         } else {
             Optional<Rate> rateInstance = daoRates.getByIds(baseCurrencyId, targetCurrencyId);
             if (rateInstance.isEmpty()) {
@@ -115,12 +126,17 @@ public class RatesService {
                 LOGGER.warn("{}", message);
                 throw new ObjectNotFoundException(message);
             }
-            daoRates.update(RateMapper.INSTANCE.toEntity(dto));
+            daoRates.update(RateMapper.INSTANCE.toEntity(
+                    rateInstance.get().id(),
+                    Long.parseLong(baseCurrencyId),
+                    Long.parseLong(targetCurrencyId),
+                    dto.rate()
+            ));
         }
         Optional<Rate> savedRateOpt = daoRates.getByIds(baseCurrencyId, targetCurrencyId);
         if (savedRateOpt.isEmpty()) {
         String message = "Ошибка создания или получения обменного курса для валют "
-                +rateCodesMessage;;
+                +rateCodesMessage;
         LOGGER.error("{}", message);
         throw new DatabaseException(message);
         }

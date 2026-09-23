@@ -21,8 +21,9 @@ import java.util.OptionalInt;
 public class JdbcDaoCurrencies implements DaoCurrencies {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcDaoCurrencies.class);
 
+    private static final String IS_EMPTY = "SELECT 1 FROM currencies LIMIT 1";
     private static final String CREATE_TABLE = """
-            CREATE TABLE currencies(
+            CREATE TABLE IF NOT EXISTS currencies(
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   code VARCHAR(30),
                   fullName VARCHAR(40),
@@ -53,11 +54,23 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
     public JdbcDaoCurrencies(){}
 
     @Override
+    public boolean isEmpty() {
+        try(Connection conn = DatabaseManager.getDataSource().getConnection();
+        PreparedStatement statement = conn.prepareStatement(IS_EMPTY);
+        ResultSet resultSet = statement.executeQuery();) {
+          return !resultSet.next();
+        } catch (SQLException exception) {
+            LOGGER.error("Ошибка проверки существования записей в таблице currencies");
+            throw new DatabaseException("Ошибка получения списка валют");
+        }
+    }
+
+    @Override
     public void createTable() {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE)) {
             stmt.executeUpdate();
-            LOGGER.debug("Таблица Currency успешно создана");
+            LOGGER.debug("Таблица Currency успешно инициализирована");
         } catch (SQLException exception) {
             String message = "Ошибка создания таблицы Currency";
             LOGGER.error(message);
