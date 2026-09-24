@@ -13,6 +13,16 @@ services:
       - '/etc/letsencrypt:/etc/letsencrypt'
     depends_on:
       - frontend
+      - backend
+    networks:
+      - dev
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - "8888"
     networks:
       - dev
 

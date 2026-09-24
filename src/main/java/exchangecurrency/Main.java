@@ -20,15 +20,13 @@ import ch.qos.logback.classic.Level;
 
 import java.io.File;
 
-public static class Main{
+public class Main{
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static final JdbcDaoCurrencies daoCurrencies = new JdbcDaoCurrencies();
     private static final JdbcDaoRates daoRates = new JdbcDaoRates();
 
     static void main() {
-//        Разобраться кто отвечает за отдачу всех курсов обмена
-//        GET http://localhost:8080//exchangeRates 405 (Method Not Allowed)
         LOGGER.info("Запуск приложения...");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
