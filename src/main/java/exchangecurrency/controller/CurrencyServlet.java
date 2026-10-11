@@ -1,5 +1,6 @@
 package exchangecurrency.controller;
 
+import exchangecurrency.dao.jdbc.JdbcDaoCurrencies;
 import exchangecurrency.dto.response.ResponseCurrencyDto;
 import exchangecurrency.exeptons.ObjectNotFoundException;
 import exchangecurrency.exeptons.ValidationException;
@@ -21,9 +22,14 @@ import java.util.Optional;
         description = "Получение конкретной валюты по коду")
 public class CurrencyServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrencyServlet.class);
-    private final CurrenciesService service;
+    private CurrenciesService service;
 
-    public CurrencyServlet (CurrenciesService service) {this.service = service;}
+    public CurrencyServlet () {}
+
+    @Override
+    public void init() {
+        this.service = new CurrenciesService(new JdbcDaoCurrencies());
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

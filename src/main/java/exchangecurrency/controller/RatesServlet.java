@@ -1,5 +1,7 @@
 package exchangecurrency.controller;
 
+import exchangecurrency.dao.jdbc.JdbcDaoCurrencies;
+import exchangecurrency.dao.jdbc.JdbcDaoRates;
 import exchangecurrency.dto.request.RequestPatchRateDto;
 import exchangecurrency.dto.response.ResponseRateDto;
 import exchangecurrency.entity.Currency;
@@ -24,9 +26,14 @@ import java.util.Optional;
         description = "Добавление нового обменного курса")
 public class RatesServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(RatesServlet.class);
-    private final RatesService service;
+    private RatesService service;
 
-    public RatesServlet (RatesService service) {this.service = service;}
+    public RatesServlet () {}
+
+    @Override
+    public void init() {
+        this.service = new RatesService(new JdbcDaoCurrencies(), new JdbcDaoRates());
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response){

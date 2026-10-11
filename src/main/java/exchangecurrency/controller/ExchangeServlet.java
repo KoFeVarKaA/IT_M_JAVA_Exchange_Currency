@@ -1,9 +1,12 @@
 package exchangecurrency.controller;
 
+import exchangecurrency.dao.jdbc.JdbcDaoCurrencies;
+import exchangecurrency.dao.jdbc.JdbcDaoRates;
 import exchangecurrency.dto.request.RequestGetRateDto;
 import exchangecurrency.dto.response.ResponseExchangeDto;
 import exchangecurrency.dto.response.ResponseRateDto;
 import exchangecurrency.mappers.ResponseExchangeDtoMapper;
+import exchangecurrency.service.CurrenciesService;
 import exchangecurrency.service.RatesService;
 import exchangecurrency.utils.ResponseMakerUtil;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,9 +24,14 @@ import java.math.BigDecimal;
                 "из одной валюты в другую")
 public class ExchangeServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExchangeServlet.class);
-    private final RatesService service;
+    private RatesService service;
 
-    public ExchangeServlet (RatesService service) {this.service = service;}
+    public ExchangeServlet () {}
+
+    @Override
+    public void init() {
+        this.service = new RatesService(new JdbcDaoCurrencies(), new JdbcDaoRates());
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

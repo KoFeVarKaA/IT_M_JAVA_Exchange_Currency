@@ -33,6 +33,7 @@ public class DatabaseManager {
 
             HikariConfig hikariConfig = new HikariConfig();
             hikariConfig.setJdbcUrl(properties.getProperty("hikari.jdbcUrl"));
+            hikariConfig.setDriverClassName("org.xerial.sqlite.JDBC");
             hikariConfig.setUsername(properties.getProperty("hikari.username"));
             hikariConfig.setPassword(properties.getProperty("hikari.password"));
             hikariConfig.setMaximumPoolSize(

@@ -27,6 +27,8 @@ public class Main{
     private static final JdbcDaoRates daoRates = new JdbcDaoRates();
 
     static void main() {
+        // Переделать запуск через нормальный tomcat и webapp
+
         LOGGER.info("Запуск приложения...");
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
@@ -45,15 +47,15 @@ public class Main{
         RatesService ratesService = new RatesService(new JdbcDaoCurrencies(), new JdbcDaoRates());
 
         // Регистрация сервлетов и пр.
-        registerServlet(ctx, new CurrenciesServlet(currenciesService),
+        registerServlet(ctx, new CurrenciesServlet(),
                 "CurrenciesServlet", "/currencies");
-        registerServlet(ctx, new CurrencyServlet(currenciesService),
+        registerServlet(ctx, new CurrencyServlet(),
                 "CurrencyServlet", "/currency/*");
-        registerServlet(ctx, new ExchangeServlet(ratesService),
+        registerServlet(ctx, new ExchangeServlet(),
                 "ExchangeServlet", "/exchange");
-        registerServlet(ctx, new RateServlet(ratesService),
+        registerServlet(ctx, new RateServlet(),
                 "RateServlet", "/exchangeRate/*");
-        registerServlet(ctx, new RatesServlet(ratesService),
+        registerServlet(ctx, new RatesServlet(),
                 "RatesServlet", "/exchangeRates");
         registerFilter(ctx, new ExceptionFilter(), "ExceptionFilter", "/*");
 

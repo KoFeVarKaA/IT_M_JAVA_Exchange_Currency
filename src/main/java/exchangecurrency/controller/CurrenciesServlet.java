@@ -1,11 +1,13 @@
 package exchangecurrency.controller;
 
+import exchangecurrency.dao.jdbc.JdbcDaoCurrencies;
 import exchangecurrency.dto.request.RequestPostCurrencyDto;
 import exchangecurrency.dto.response.ResponseCurrencyDto;
 import exchangecurrency.exeptons.ValidationException;
 import exchangecurrency.service.CurrenciesService;
 import exchangecurrency.service.validator.CurrencyValidator;
 import exchangecurrency.utils.ResponseMakerUtil;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +22,14 @@ import java.util.List;
         description = "Получение списка валют; Добавление новой валюты в базу")
 public class CurrenciesServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrenciesServlet.class);
-    private final CurrenciesService service;
+    private CurrenciesService service;
 
-    public CurrenciesServlet (CurrenciesService service) {this.service = service;}
+    public CurrenciesServlet () {}
+
+    @Override
+    public void init() {
+        this.service = new CurrenciesService(new JdbcDaoCurrencies());
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
