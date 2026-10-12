@@ -19,23 +19,27 @@
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
               version="1.0">
-<user username="admin" password="admin" roles="manager-gui" />
-<!--
-  By default, no user is included in the "manager-gui" role required
-  to operate the "/manager/html" web application.  If you wish to use this app,
-  you must define such a user - the username and password are arbitrary.
 
-  Built-in Tomcat manager roles:
-    - manager-gui    - allows access to the HTML GUI and the status pages
-    - manager-script - allows access to the HTTP API and the status pages
-    - manager-jmx    - allows access to the JMX proxy and the status pages
-    - manager-status - allows access to the status pages only
+    <role rolename="manager-gui"/>
+    <role rolename="admin-gui"/>
+    <user username="admin" password="test1234" roles="manager-gui" />
 
-  The users below are wrapped in a comment and are therefore ignored. If you
-  wish to configure one or more of these users for use with the manager web
-  application, do not forget to remove the <!.. ..> that surrounds them. You
-  will also need to set the passwords to something appropriate.
--->
+    <!--
+      By default, no user is included in the "manager-gui" role required
+      to operate the "/manager/html" web application.  If you wish to use this app,
+      you must define such a user - the username and password are arbitrary.
+
+      Built-in Tomcat manager roles:
+        - manager-gui    - allows access to the HTML GUI and the status pages
+        - manager-script - allows access to the HTTP API and the status pages
+        - manager-jmx    - allows access to the JMX proxy and the status pages
+        - manager-status - allows access to the status pages only
+
+      The users below are wrapped in a comment and are therefore ignored. If you
+      wish to configure one or more of these users for use with the manager web
+      application, do not forget to remove the <!.. ..> that surrounds them. You
+      will also need to set the passwords to something appropriate.
+    -->
 <!--
   <user username="admin" password="<must-be-changed>" roles="manager-gui"/>
   <user username="robot" password="<must-be-changed>" roles="manager-script"/>

@@ -1,35 +1,11 @@
-networks:
-  dev:
-
+version: '3.8'
 
 services:
-  nginx:
-    image: nginx:stable-alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - './nginx.conf:/etc/nginx/nginx.conf'
-      - '/etc/letsencrypt:/etc/letsencrypt'
-    depends_on:
-      - frontend
-    networks:
-      - dev
-
-  backend:
+  tomcat-server:
     build:
       context: .
       dockerfile: Dockerfile
-    expose:
-      - "8888"
-    networks:
-      - dev
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: src/main/webapp/WEB-INF/Dockerfile
-    expose:
-      - "3000"
-    networks:
-      - dev
+    container_name: tomcat8080
+    ports:
+      - "8080:8080"
+    restart: always
