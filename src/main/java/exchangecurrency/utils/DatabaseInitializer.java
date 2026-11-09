@@ -30,8 +30,8 @@ public class DatabaseInitializer implements ServletContextListener {
 
     private static void initDataBase(){
         try {
-//            daoCurrencies.deleteTable();
-//            daoRates.deleteTable();
+//            daoCurrencies.dropTable();
+//            daoRates.dropTable();
             daoCurrencies.createTable();
             daoRates.createTable();
 

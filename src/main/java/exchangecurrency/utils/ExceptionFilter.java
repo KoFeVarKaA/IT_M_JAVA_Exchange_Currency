@@ -31,8 +31,12 @@ public class ExceptionFilter extends HttpFilter {
             if (e instanceof BaseException baseEx) {
                 statusCode = baseEx.getErrorCode();
             } else {
-                LOGGER.error("Неопределенная ошибка: {}: {}", e.getClass(), e.getMessage());
-                statusCode = 500;
+//                LOGGER.error("Неопределенная ошибка: {}: {} \n {}",
+//                        e.getClass(), e.getMessage(), e.getCause().toString());
+//                statusCode = 500;
+
+                LOGGER.error("Неопределенная ошибка (500 Internal Server Error): ", e);
+                statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             }
             ResponseMakerUtil.sendJson(
                     response, statusCode, new ResponseErrorDto(statusCode, e.getMessage()));

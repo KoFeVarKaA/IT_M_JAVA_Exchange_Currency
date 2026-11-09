@@ -17,8 +17,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 @WebServlet(urlPatterns = "/exchangeRate/*",
         description = "Получение/обновление конкретного обменного курса")
@@ -51,16 +53,17 @@ public class RateServlet extends HttpServlet {
 
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response)
-            throws UnsupportedEncodingException {
+            throws IOException {
         request.setCharacterEncoding("UTF-8");
         String messageRequest = "doPATCH - /exchangeRate";
         String pathInfo = request.getPathInfo();
         String codesStr = getValidCodesStr(messageRequest, pathInfo);
-        RateValidator.validateRate(request.getParameter("rate"));
+        String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        String rate = body.split("=")[1];
         RequestPatchRateDto requestDto = new RequestPatchRateDto(
                 codesStr.substring(0, 3),
                 codesStr.substring(3, 6),
-                new BigDecimal(request.getParameter("rate"))
+                new BigDecimal(rate)
                 );
         ResponseRateDto responseDto = service.postUpdateRate(requestDto, false);
         LOGGER.debug("{} - ответ: {}", messageRequest, responseDto);

@@ -31,7 +31,7 @@ public class JdbcDaoRates implements DaoRates {
                 rate NUMERIC(12, 6)
                 );
                 """;
-    private static final String DELETE_TABLE = "DROP TABLE rates;";
+    private static final String DELETE_TABLE = "DROP TABLE IF EXISTS rates;";
     private static final String POST = """
                 INSERT INTO rates (baseCurrencyId, targetCurrencyId, rate)
                 VALUES (?, ?, ?);
@@ -94,7 +94,7 @@ public class JdbcDaoRates implements DaoRates {
     }
 
     @Override
-    public void deleteTable() {
+    public void dropTable() {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement stmt = conn.prepareStatement(DELETE_TABLE)) {
             stmt.executeUpdate();

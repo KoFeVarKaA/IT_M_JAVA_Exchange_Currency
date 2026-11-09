@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    const host = "http://localhost:8091/currencyExchange"
+    const host = "http://localhost:8080/currencyExchange"
 
     // Fetch the list of currencies and populate the select element
     function requestCurrencies() {
@@ -132,7 +132,7 @@ $(document).ready(function() {
         // get the currency pair and exchange rate from the modal
         const pair = $('#edit-exchange-rate-modal .modal-title').text().replace('Edit ', '').replace(' Exchange Rate', '');
         const exchangeRate = $('#edit-exchange-rate-modal #exchange-rate-input').val();
-
+        
         // send values to the server with a patch request
         $.ajax({
             url: `${host}/exchangeRate/${pair}`,

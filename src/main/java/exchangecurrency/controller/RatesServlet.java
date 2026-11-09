@@ -54,7 +54,7 @@ public class RatesServlet extends HttpServlet {
                 request.getParameter("rate"));
         CurrencyValidator.validateCode(baseCurrencyCode);
         CurrencyValidator.validateCode(targetCurrencyCode);
-        RateValidator.validateRate(request.getParameter("rate"));
+        RateValidator.validateRate(request.getPathInfo(), request.getParameter("rate"));
         RequestPatchRateDto requestDto = new RequestPatchRateDto(
                 baseCurrencyCode, targetCurrencyCode,
                 new BigDecimal(request.getParameter("rate"))

@@ -9,7 +9,7 @@ import java.util.OptionalInt;
 public interface DaoCurrencies {
     boolean isEmpty();
     void createTable();
-    void deleteTable();
+    void dropTable();
     void post(Currency dto);
     Optional<Currency> getById(String id);
     Optional<Currency> getByCode(String code);

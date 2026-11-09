@@ -40,3 +40,4 @@ build/
 src/main/resources/config.properties
 my_database.db
 /tomcat-logs
+/.smarttomcat

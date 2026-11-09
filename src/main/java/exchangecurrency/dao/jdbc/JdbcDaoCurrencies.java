@@ -29,9 +29,9 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
                   sign VARCHAR(5)
                 );
             """;
-    private static final String DROP_TABLE = "DROP TABLE currencies;";
+    private static final String DROP_TABLE = "DROP TABLE IF EXISTS currencies;";
     private static final String POST = """
-            INSERT INTO currencies (code, fullname, sign) 
+            INSERT INTO currencies (code, fullName, sign) 
             VALUES (?, ?, ?);
             """;
     private static final String GET_BY_ID = "SELECT * FROM currencies WHERE id = ?";
@@ -41,7 +41,7 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
     private static final String UPDATE = """
             UPDATE currencies
             SET code = ?,
-                fullname = ?,
+                fullName = ?,
                 sign = ?
             WHERE id = ?;
             """;
@@ -78,9 +78,9 @@ public class JdbcDaoCurrencies implements DaoCurrencies {
     }
 
     @Override
-    public void deleteTable() {
+    public void dropTable() {
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(CREATE_TABLE)) {
+             PreparedStatement stmt = conn.prepareStatement(DROP_TABLE)) {
             stmt.executeUpdate();
             LOGGER.debug("Таблица Currencies успешно удалена");
         } catch (SQLException exception) {

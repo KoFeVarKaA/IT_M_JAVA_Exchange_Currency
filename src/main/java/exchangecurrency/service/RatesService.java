@@ -76,6 +76,18 @@ public class RatesService {
                         resultRate
                 );
             }
+        }
+
+        // Обработка Случая AA или BB
+        if (baseCurrencyId.equals(targetCurrencyId)) {
+            return ResponseRateDtoMapper.INSTANCE.toDto(
+                    new Rate (-1,
+                            Long.parseLong(baseCurrencyId),
+                            Long.parseLong(targetCurrencyId), new BigDecimal(1)),
+                    baseCurrencyOpt.get(),
+                    targetCurrencyOpt.get(),
+                    new BigDecimal(1)
+            );
         } else {LOGGER.error("ВАЛЮТА USD НЕ НАЙДЕНА. Создайте валюту code = 'USD'");}
         String message = """
                 Курс обмена для валютных пар с id %s:%s, %s:%s или %s:%s и %s:%s не найден\
