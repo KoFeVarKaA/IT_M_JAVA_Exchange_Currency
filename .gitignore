@@ -42,3 +42,5 @@ my_database.db
 /tomcat-logs
 /.smarttomcat
 currencyExchangeForServer.war
+
+.idea
